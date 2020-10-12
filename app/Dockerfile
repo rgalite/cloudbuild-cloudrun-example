@@ -2,6 +2,14 @@
 # https://hub.docker.com/_/php
 FROM php:7.3-apache
 
+RUN apt-get update -y && apt-get install git zip unzip -y
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Install dependencies
+WORKDIR /var/www/html/
+COPY composer.json /var/www/html
+RUN composer install
+
 # Copy local code to the container image.
 COPY . /var/www/html/
 
