@@ -1,0 +1,8 @@
+project_id = "cloudbuild-cloudrun-example"
+
+project_number = "471986975232"
+
+sql_user = {
+  username = "foobar"
+  password = "foobar"
+}
