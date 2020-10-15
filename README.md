@@ -68,6 +68,7 @@ git push --all google
 ```
 
 Head over to the cloud build console to see the deployment:
+
 ![Cloudbuild screenshot](https://lh4.googleusercontent.com/k4r5V4yuzSyppu2lz8IefucQsjpW3HwzWRGX34fgRuJzddPWhEn6e4IN6Ijh19jp9Wa3ZSudJWtP08iVCSnXDSOjfu4f-pLR0t43ZcqR "Cloudbuild screenshot")
 
 The CI/CD process:
