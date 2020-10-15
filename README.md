@@ -55,7 +55,7 @@ The terraform script creates:
 terraform output url
 ```
 
-![Cloudrun default](https://lh4.googleusercontent.com/k4r5V4yuzSyppu2lz8IefucQsjpW3HwzWRGX34fgRuJzddPWhEn6e4IN6Ijh19jp9Wa3ZSudJWtP08iVCSnXDSOjfu4f-pLR0t43ZcqR "Cloudrun default")
+![Cloudrun default](https://lh6.googleusercontent.com/2fxQREqvSeUiLVvPxcPDIKb7cfBF-yJbHLtcBhNvjpoZhH7E21c_tdg8Ddyzw7askSCZw1sALydt7llkRXkJZeGiotmksGctOwH6smJiuXROoDTPMlRNaXtBlbkb9SDIaD_3uz6jCw "Cloudrun default")
 
 ## Deploy an app with the CI/CD pipeline
 
