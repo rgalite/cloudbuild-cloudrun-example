@@ -61,6 +61,7 @@ resource "google_cloud_run_service" "default" {
   autogenerate_revision_name = true
 
   depends_on = [
+    google_project_service.run,
     google_service_account.cloudrun_service_account,
   ]
 }

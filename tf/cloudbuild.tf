@@ -46,6 +46,7 @@ resource "google_cloudbuild_trigger" "default" {
   }
 
   depends_on = [
+    google_project_service.sourcerepo,
     google_sourcerepo_repository.default
   ]
 }

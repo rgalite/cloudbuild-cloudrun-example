@@ -24,12 +24,6 @@ Clone the git repository to your console:
 git clone git@github.com:rgalite/cloudbuild-cloudrun-example.git
 ```
 
-Enable the following Cloud Source Repositories, Cloud Build and Cloud Run APIs by navigating to the `scripts` folder and running the following command:
-
-```
-./enable-apis.sh
-```
-
 ## Terraform plan
 Navigate to the tf directory, copy the `terraform.tfvars.example` to `terraform.tfvars` and fill in the variables.
 
