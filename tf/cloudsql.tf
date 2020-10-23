@@ -1,5 +1,5 @@
 resource "google_sql_database_instance" "default" {
-  name   = "${var.project_id}-db-1"
+  name   = "${var.project_id}-db-${random_id.google_sql_database.hex}"
   region = var.region
   database_version = "MYSQL_5_7"
 
@@ -13,6 +13,10 @@ resource "google_sql_database_instance" "default" {
       }
     }
   }
+}
+
+resource "random_id" "google_sql_database" {
+  byte_length = 8
 }
 
 resource "google_sql_database" "default" {
