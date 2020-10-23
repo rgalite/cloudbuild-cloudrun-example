@@ -58,6 +58,10 @@ resource "google_project_iam_binding" "cloudbuild_iam" {
   members = [
     "serviceAccount:${var.project_number}@cloudbuild.gserviceaccount.com"
   ]
+
+  depends_on = [
+    google_cloudbuild_trigger.default
+  ]
 }
 
 resource "google_project_iam_binding" "cloudbuild_sa" {
@@ -66,5 +70,9 @@ resource "google_project_iam_binding" "cloudbuild_sa" {
 
   members = [
     "serviceAccount:${var.project_number}@cloudbuild.gserviceaccount.com"
+  ]
+
+  depends_on = [
+    google_cloudbuild_trigger.default
   ]
 }
