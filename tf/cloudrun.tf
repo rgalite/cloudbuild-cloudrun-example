@@ -21,32 +21,32 @@ resource "google_cloud_run_service" "default" {
         image = "gcr.io/cloudrun/hello"
 
         env {
-          name = "CLOUD_SQL_CONNECTION_NAME"
+          name  = "CLOUD_SQL_CONNECTION_NAME"
           value = google_sql_database_instance.default.connection_name
         }
 
         env {
-          name = "INSTANCE_CONNECTION_NAME"
+          name  = "INSTANCE_CONNECTION_NAME"
           value = google_sql_database_instance.default.connection_name
         }
 
         env {
-          name = "DB_HOST"
+          name  = "DB_HOST"
           value = google_sql_database_instance.default.public_ip_address
         }
 
         env {
-          name = "DB_USER"
+          name  = "DB_USER"
           value = var.sql_user.username
         }
 
         env {
-          name = "DB_PASS"
+          name  = "DB_PASS"
           value = var.sql_user.password
         }
 
         env {
-          name = "DB_NAME"
+          name  = "DB_NAME"
           value = var.sql_db_name
         }
       }
@@ -67,7 +67,7 @@ resource "google_cloud_run_service" "default" {
 }
 
 resource "google_cloud_run_service_iam_member" "member" {
-  service = google_cloud_run_service.default.name
+  service  = google_cloud_run_service.default.name
   location = google_cloud_run_service.default.location
   role     = "roles/run.invoker"
   member   = "allUsers"

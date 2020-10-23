@@ -2,7 +2,7 @@ resource "google_cloudbuild_trigger" "default" {
   trigger_template {
     branch_name = "main"
     repo_name   = google_sourcerepo_repository.default.name
-    dir = "app"
+    dir         = "app"
   }
 
   build {
@@ -29,7 +29,7 @@ resource "google_cloudbuild_trigger" "default" {
     }
 
     step {
-      name = "gcr.io/google.com/cloudsdktool/cloud-sdk"
+      name       = "gcr.io/google.com/cloudsdktool/cloud-sdk"
       entrypoint = "gcloud"
       args = [
         "run",
