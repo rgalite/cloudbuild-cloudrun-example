@@ -7,3 +7,6 @@ resource "google_project_service" "run" {
 resource "google_project_service" "sourcerepo" {
   service = "sourcerepo.googleapis.com"
 }
+resource "google_project_service" "redis" {
+  service = "redis.googleapis.com"
+}
