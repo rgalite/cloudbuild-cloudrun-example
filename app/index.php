@@ -1,6 +1,6 @@
 <?php
-/*
- * Copyright 2020 Google LLC.
+/**
+ * Copyright 2019 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,30 @@
  * limitations under the License.
  */
 
-declare(strict_types=1);
+// Only serve traffic from "/"
+switch (@parse_url($_SERVER['REQUEST_URI'])['path']) {
+    case '/':
+        break;
+    default:
+        http_response_code(404);
+        exit('Not Found');
+}
 
-use GuzzleHttp\Psr7;
+// Connect to Memorystore from App Engine.
+if (!$host = getenv('REDIS_HOST')) {
+    throw new Exception('The REDIS_HOST environment variable is required');
+}
 
-include __DIR__ . '/vendor/autoload.php';
+# Memorystore Redis port defaults to 6379
+$port = getenv('REDIS_PORT') ?: '6379';
 
-$app = include __DIR__ . '/src/app.php';
+try {
+    $redis = new Redis();
+    $redis->connect($host, $port);
+} catch (Exception $e) {
+    return print('Error: ' . $e->getMessage());
+}
 
-$app->get('/', function ($request, $response) {
-    $this->get('votes')->createTableIfNotExists();
+$value = $redis->incr('counter');
 
-    return $this->get('view')->render($response, 'template.twig', [
-        'votes' => $this->get('votes')->listVotes(),
-        'tabCount' => $this->get('votes')->getCountByValue('TABS'),
-        'spaceCount' => $this->get('votes')->getCountByValue('SPACES'),
-    ]);
-});
-
-$app->post('/', function ($request, $response) {
-    $this->get('votes')->createTableIfNotExists();
-
-    $message = 'Invalid vote. Choose Between TABS and SPACES';
-
-    $formData = $request->getParsedBody() + [
-        'voteValue' => ''
-    ];
-
-    if (in_array($formData['voteValue'], ['SPACES', 'TABS'])) {
-        $message = $this->get('votes')->insertVote($formData['voteValue'])
-            ? 'Vote cast for ' . $formData['voteValue']
-            : 'An error occurred';
-    }
-
-    return $response->withBody(Psr7\stream_for($message));
-});
-
-$app->run();
+printf('Visitor number: %s', $value);

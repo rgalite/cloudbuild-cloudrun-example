@@ -1,170 +1,130 @@
-# Connection to Cloud SQL - MySQL
+# Connect to Cloud Memorystore from Google App Engine
 
-## Before you begin
+This sample application demonstrates how to use
+[Cloud Memorystore for Redis](https://cloud.google.com/memorystore/docs/)
+with Google App Engine for PHP 7.2.
 
-1. Before you use this code sample, you need to have
-[Composer](https://getcomposer.org/) installed or downloaded into this folder.
-Download instructions can be found [here](https://getcomposer.org/download/).
-Once you've installed composer, use it to install required dependencies by
-running `composer install`.
-2. Create a MySQL Cloud SQL Instance by following these
-[instructions](https://cloud.google.com/sql/docs/mysql/create-instance). Note
-the connection string, database user, and database password that you create.
-3. Create a database for your application by following these
-[instructions](https://cloud.google.com/sql/docs/mysql/create-manage-databases).
-Note the database name.
-4. Create a service account with the 'Cloud SQL Client' permissions by following
-these
-[instructions](https://cloud.google.com/sql/docs/mysql/connect-external-app#4_if_required_by_your_authentication_method_create_a_service_account).
-Download a JSON key to use to authenticate your connection.
+**Prerequisites**
 
-## Running Locally
+- Install the [Google Cloud SDK](https://developers.google.com/cloud/sdk/).
 
-To run this application locally, download and install the `cloud_sql_proxy` by
-following the instructions [here](https://cloud.google.com/sql/docs/mysql/sql-proxy#install).
+## Setup
 
-Instructions are provided below for using the proxy with a TCP connection or a
-Unix domain socket. On Linux or macOS, you can use either option, but the
-Windows proxy currently requires a TCP connection.
+Before you can run or deploy the sample, you will need to do the following:
 
-### Unix Socket mode
-NOTE: this option is currently only supported on Linux and macOS. Windows users
-should use the TCP option.
+1. Create a [Memorystore instance][memorystore_create]. You can do this from the
+   [Cloud Console](https://console.developers.google.com) or via the
+   [Cloud SDK](https://cloud.google.com/sdk). To create it via the SDK use the
+   following command:
 
-To use a Unix socket, you'll need to create a directory and give write access to
-the user running the proxy:
+        $ gcloud beta redis instances create YOUR_INSTANCE_NAME --region=REGION_ID
 
-```bash
-sudo mkdir /path/to/the/new/directory
-sudo chown -R $USER /path/to/the/new/directory
-```
+1. Update the environment variables `REDIS_HOST` and `REDIS_PORT` in `app.yaml`
+   with your configuration values. These values are used when the application is
+   deployed. Run the following command to get the values for your isntance:
 
-You'll also need to initialize an environment variable pointing to the directory
-you just created:
+        $ gcloud beta redis instances describe YOUR_INSTANCE_NAME --region=REGION_ID
 
-```bash
-export DB_SOCKET_DIR=/path/to/the/new/directory
-```
+[memorystore_create]: https://cloud.google.com/memorystore/docs/redis/creating-managing-instances
 
-Use these terminal commands to initialize other environment variables as well:
+## Run locally
 
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service/account/key.json
-export CLOUD_SQL_CONNECTION_NAME='<MY-PROJECT>:<INSTANCE-REGION>:<INSTANCE-NAME>'
-export DB_USER='<DB_USER_NAME>'
-export DB_PASS='<DB_PASSWORD>'
-export DB_NAME='<DB_NAME>'
-```
+You can connect to a local database instance by setting the `REDIS_` environment
+variables to your local instance. Alternatively, you can set them to your Cloud
+Memorystore instance, but you will need to create a firewall rule for this,
+which may be a safety concern.
 
-Note: Saving credentials in environment variables is convenient, but not
-secure - consider a more secure solution such as
-[Secret Manager](https://cloud.google.com/secret-manager/) to help keep secrets
-safe.
+```sh
+cd php-docs-samples/appengine/php72/memorystore
 
-Then use the following command to launch the proxy in the background:
+# set local connection parameters
+export REDIS_HOST=127.0.0.1
+export REDIS_PORT=6379
 
-```bash
-./cloud_sql_proxy -dir=$DB_SOCKET_DIR --instances=$CLOUD_SQL_CONNECTION_NAME --credential_file=$GOOGLE_APPLICATION_CREDENTIALS &
-```
-
-### TCP mode
-To run the sample locally with a TCP connection, set environment variables and
-launch the proxy as shown below.
-
-#### Linux / macOS
-Use these terminal commands to initialize environment variables:
-
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service/account/key.json
-export CLOUD_SQL_CONNECTION_NAME='<MY-PROJECT>:<INSTANCE-REGION>:<INSTANCE-NAME>'
-export DB_HOST='127.0.0.1'
-export DB_USER='<DB_USER_NAME>'
-export DB_PASS='<DB_PASSWORD>'
-export DB_NAME='<DB_NAME>'
-```
-
-Note: Saving credentials in environment variables is convenient, but not
-secure - consider a more secure solution such as
-[Secret Manager](https://cloud.google.com/secret-manager/) to help keep secrets
-safe.
-
-Then use the following command to launch the proxy in the background:
-
-```bash
-./cloud_sql_proxy -instances=$CLOUD_SQL_CONNECTION_NAME=tcp:3306 -credential_file=$GOOGLE_APPLICAITON_CREDENTIALS &
-```
-
-#### Windows/PowerShell
-Use these PowerShell commands to initialize environment variables:
-
-```powershell
-$env:GOOGLE_APPLICATION_CREDENTIALS="<CREDENTIALS_JSON_FILE>"
-$env:DB_HOST="127.0.0.1"
-$env:DB_USER="<DB_USER_NAME>"
-$env:DB_PASS="<DB_PASSWORD>"
-$env:DB_NAME="<DB_NAME>"
-```
-
-Note: Saving credentials in environment variables is convenient, but not
-secure - consider a more secure solution such as
-[Secret Manager](https://cloud.google.com/secret-manager/) to help keep secrets
-safe.
-
-Then use the following command to launch the proxy in a separate PowerShell
-session:
-
-```powershell
-Start-Process -filepath "C:\<path to proxy exe>" -ArgumentList "-instances=<project-id>:<region>:<instance-name>=tcp:3306 -credential_file=<CREDENTIALS_JSON_FILE>"
-```
-
-### Testing the application
-Execute the following to start the application server:
-``` bash
 php -S localhost:8080
 ```
 
-Navigate towards http://localhost:8080 to verify your application is running
-correctly.
+> be sure the `REDIS_` environment variables are appropriate for your Redis
+  instance.
 
-## Google App Engine Flex
-To run on App Engine Flex, create an App Engine project by following the setup
-for these
-[instructions](https://cloud.google.com/appengine/docs/standard/php7/quickstart#before-you-begin).
+Now you can view the app running at [http://localhost:8080](http://localhost:8080)
+in your browser.
 
-First, update `app.flex.yaml` with the correct values to pass the environment
-variables into the runtime.
+## Set up Serverless VPC Access
 
-To use a TCP connection instead of a Unix socket to connect your sample to your
-Cloud SQL instance on App Engine, make sure to uncomment the `DB_HOST`
-field under `env_variables`. Also make sure to remove the uncommented
-`beta_settings` and `cloud_sql_instances` fields and replace them with the
-commented `beta_settings` and `cloud_sql_instances` fields.
+**IMPORTANT** App Engine requires a [Serverless VPC Access][vpc-access]
+connector to connect to Memorystore.
 
-Then, make sure that the service account
-`service-{PROJECT_NUMBER}>@gae-api-prod.google.com.iam.gserviceaccount.com` has
-the IAM role `Cloud SQL Client`.
+In order for App Engine to connect to Memorystore, you must first
+[configure a Serverless VPC Access connector][configure-vpc]. For example:
 
-Next, the following command will deploy the application to your Google Cloud
-project:
-
-```bash
-$ gcloud beta app deploy app.flex.yaml
+```
+# Example command to create a VPC connector. See the docs for more details.
+$ gcloud beta compute networks vpc-access connectors create CONNECTOR_NAME \
+	--region=REGION_ID \
+	--range="10.8.0.0/28"
+	--project=PROJECT_ID
 ```
 
-## Google App Engine Standard
-Note: App Engine Standard does not support TCP connections to Cloud SQL
-instances, only Unix socket connections.
+Next, you neded to [configure App Engine to connect to your VPC network][connecting-appengine].
+This is done by modifying [`app.yaml`](app.yaml) and setting the full name of
+the connector you just created under `vpc_access_connector`.
 
-To run on GAE-Standard, create an App Engine project by following the setup for
-these
-[instructions](https://cloud.google.com/appengine/docs/standard/php7/quickstart#before-you-begin).
-
-First, update `app.standard.yaml` with the correct values to pass the
-environment variables into the runtime.
-
-Next, the following command will deploy the application to your Google Cloud
-project:
-
-```bash
-$ gcloud app deploy app.standard.yaml
 ```
+vpc_access_connector:
+  name: "projects/PROJECT_ID/locations/REGION_ID/connectors/CONNECTOR_NAME"
+```
+
+**Note**: Serverless VPC Access incurs additional billing. See
+[pricing][vpc-pricing] for details.
+
+[vpc-access]: https://cloud.google.com/vpc
+[configure-vpc]: https://cloud.google.com/vpc/docs/configure-serverless-vpc-access
+[connecting-appengine]: https://cloud.google.com/appengine/docs/standard/python/connecting-vpc#configuring
+[vpc-pricing]: https://cloud.google.com/compute/pricing#network
+
+## Deploy to App Engine
+
+**IMPORTANT** Because Serverless VPC Connector is in *beta*, you must deploy to App Engine
+using the `gcloud beta app deploy` command. Without this, the connection to
+Memorystore *will not work*.
+
+```
+$ gcloud beta app deploy --project PROJECT_ID
+```
+
+Now open `https://{YOUR_PROJECT_ID}.appspot.com/` in your browser to see the running
+app.
+
+**Note**: This example requires the `redis.so` extension to be enabled on your App Engine
+instance. This is done by including [`php.ini`](php.ini) in your project root.
+
+## Troubleshooting
+
+### Connection timed out
+
+If you receive the error "Error: Connection timed out", it's possible your VPC Connector
+is not fully set up. Run the following and check the property `state` is set to READY:
+
+```
+$ gcloud beta compute networks vpc-access connectors describe CONNECTOR_NAME --region=REGION_ID
+```
+
+If you continue to see the timeout error, try creating a new VPC connector with a different
+CIDR `range`.
+
+### Name or service not known
+
+If you receive the following error, make sure you set the `REDIS_HOST` environment variable in `app.yaml` to be the
+host of your Memorystore for Redis instance.
+
+```
+PHP message: PHP Warning: Redis::connect(): php_network_getaddresses: getaddrinfo failed: Name or service not known in /srv/index.php
+```
+
+### Request contains an invalid argument
+
+If you receive this error, it is because either the `gcloud` command to create the VPC 
+Access connector was missing the `--range` option, or the value supplied to the
+`--range` option did not use the `/28` CIDR mask as required. Be sure to supply a valid
+CIDR range ending in `/28`.

@@ -3,17 +3,16 @@
 FROM php:7.3-apache
 
 RUN apt-get update -y && apt-get install git zip unzip -y
-RUN docker-php-ext-install pdo pdo_mysql mysqli
 RUN service apache2 restart
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install dependencies
 WORKDIR /var/www/html/
-COPY composer.json /var/www/html
+COPY composer.json ./
 RUN composer install
 
 # Copy local code to the container image.
-COPY . /var/www/html/
+COPY . ./
 
 # Use the PORT environment variable in Apache configuration files.
 RUN sed -i 's/80/${PORT}/g' /etc/apache2/sites-available/000-default.conf /etc/apache2/ports.conf
