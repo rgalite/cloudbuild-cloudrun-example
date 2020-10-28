@@ -1,17 +1,11 @@
 resource "google_sql_database_instance" "default" {
-  name   = "${var.project_id}-db-${random_id.google_sql_database.hex}"
-  region = var.region
+  name             = "${var.project_id}-db-${random_id.google_sql_database.hex}"
+  region           = var.region
   database_version = "MYSQL_5_7"
 
   settings {
-    tier = "db-f1-micro"
+    tier              = "db-f1-micro"
     availability_type = "ZONAL"
-
-    ip_configuration {
-      authorized_networks {
-        value = "0.0.0.0/0"
-      }
-    }
   }
 }
 
